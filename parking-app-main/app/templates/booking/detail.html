@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}Booking #{{ booking.id }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <a href="{{ url_for('user.booking_list') }}" class="btn btn-link text-decoration-none mb-3 px-0">
+        <i class="bi bi-arrow-left me-2"></i>Back to my bookings
+      </a>
+      <h1 class="page-title mb-2">Booking Details</h1>
+      <p class="lead text-muted mb-0">Reservation #{{ booking.id }}</p>
+    </div>
+  </div>
+  
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Booking Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Vehicle</h6>
+              <p class="mb-0 fw-medium">{{ booking.vehicle_plate }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Status</h6>
+              <p class="mb-0">
+                {% if booking.status == 'active' %}
+                  <span class="badge bg-success text-capitalize fs-6">{{ booking.status }}</span>
+                {% elif booking.status == 'completed' %}
+                  <span class="badge bg-secondary text-capitalize fs-6">{{ booking.status }}</span>
+                {% elif booking.status == 'cancelled' %}
+                  <span class="badge bg-danger text-capitalize fs-6">{{ booking.status }}</span>
+                {% else %}
+                  <span class="badge bg-light text-dark text-capitalize fs-6">{{ booking.status }}</span>
+                {% endif %}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Start Time</h6>
+              <p class="mb-0 fw-medium">{{ booking.start_time.strftime('%Y-%m-%d') }}</p>
+              <p class="text-muted mb-0">{{ booking.start_time.strftime('%H:%M') }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">End Time</h6>
+              <p class="mb-0 fw-medium">{{ booking.end_time.strftime('%Y-%m-%d') }}</p>
+              <p class="text-muted mb-0">{{ booking.end_time.strftime('%H:%M') }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Duration</h6>
+              <p class="mb-0 fw-medium">{{ booking.duration }} minutes</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Total Amount</h6>
+              <p class="mb-0 fw-medium">{{ '%.2f'|format(booking.total_amount or 0) }} USD</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Parking Location</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-start mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+              <i class="bi bi-geo-alt-fill" style="font-size: 1.25rem;"></i>
+            </div>
+            <div>
+              <h6 class="mb-1">{{ booking.spot.parking_lot.name }}</h6>
+              <p class="text-muted mb-0 small">{{ booking.spot.parking_lot.address.street }}, {{ booking.spot.parking_lot.address.city }}</p>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted mb-2">Spot Information</h6>
+            <p class="mb-1">
+              <span class="badge bg-primary me-2">Spot #{{ booking.spot.spot_number }}</span>
+              <span class="badge bg-light text-dark text-capitalize">{{ booking.spot.spot_type }}</span>
+            </p>
+            {% if booking.spot.has_charger %}
+              <span class="badge bg-success">
+                <i class="bi bi-lightning-charge me-1"></i>Charger Available
+              </span>
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted mb-2">Rate</h6>
+            <p class="mb-0 fw-medium">{{ booking.spot.parking_lot.hourly_rate }} USD per hour</p>
+          </div>
+        </div>
+      </div>
+      
+      {% if booking.status == 'pending' %}
+      <!-- Payment Required Card -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body text-center">
+          <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 64px; height: 64px;">
+            <i class="bi bi-credit-card-fill" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="mb-2">Payment Required</h5>
+          <p class="text-muted mb-3">Complete your payment to confirm this booking reservation.</p>
+          <a href="{{ url_for('payment.process_payment', booking_id=booking.id) }}" class="btn btn-primary w-100 py-2 mb-2">
+            <i class="bi bi-credit-card me-2"></i>Pay Now
+          </a>
+          <button class="btn btn-outline-danger w-100 py-2" data-bs-toggle="modal" data-bs-target="#cancelModal">
+            <i class="bi bi-x-circle me-2"></i>Cancel Booking
+          </button>
+        </div>
+      </div>
+      {% elif booking.status == 'confirmed' %}
+      <!-- Confirmed Booking Actions -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body text-center">
+          <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 64px; height: 64px;">
+            <i class="bi bi-check-circle-fill" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="mb-2">Booking Confirmed</h5>
+          <p class="text-muted mb-3">Your payment has been processed and your spot is reserved.</p>
+          {% if payment %}
+          <a href="{{ url_for('payment.payment_receipt', payment_id=payment.id) }}" target="_blank" class="btn btn-outline-primary w-100 py-2 mb-2">
+            <i class="bi bi-receipt me-2"></i>View Receipt
+          </a>
+          {% endif %}
+          <button class="btn btn-outline-danger w-100 py-2" data-bs-toggle="modal" data-bs-target="#cancelModal">
+            <i class="bi bi-x-circle me-2"></i>Cancel Booking
+          </button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-sm">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" id="cancelModalLabel">Confirm Cancellation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-0">
+        <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+        <p class="mb-0">Reservation #{{ booking.id }} for spot #{{ booking.spot.spot_number }} at {{ booking.spot.parking_lot.name }}</p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-lg btn-outline-secondary px-4" data-bs-dismiss="modal">Keep Booking</button>
+        <a href="{{ url_for('user.cancel_booking', booking_id=booking.id) }}" class="btn btn-lg btn-danger px-4">
+          <i class="bi bi-x-circle me-2"></i>Cancel Booking
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

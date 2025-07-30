@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Parking Solutions{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-gradient-primary text-white py-5">
+  <div class="container">
+    <div class="row align-items-center min-vh-75">
+      <div class="col-lg-6">
+        <div class="hero-content">
+          <h1 class="display-4 fw-bold mb-4">Find Parking<br><span class="text-warning">Anywhere, Anytime</span></h1>
+          <p class="lead mb-4 text-light">Never circle the block again! Find and reserve parking spots instantly with real-time availability. Save time, reduce stress, and park with confidence.</p>
+          <div class="d-flex flex-wrap gap-3 mb-4">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg px-4 py-3 fw-semibold">
+              <i class="bi bi-person-plus me-2"></i>Sign Up Free
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4 py-3">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            </a>
+          </div>
+          <div class="d-flex align-items-center text-light">
+            <div class="me-4">
+              <i class="bi bi-check-circle-fill text-warning me-2"></i>
+              <small>No more circling blocks</small>
+            </div>
+            <div class="me-4">
+              <i class="bi bi-check-circle-fill text-warning me-2"></i>
+              <small>Reserve in advance</small>
+            </div>
+            <div>
+              <i class="bi bi-check-circle-fill text-warning me-2"></i>
+              <small>Guaranteed spot</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <div class="hero-image">
+          <div class="parking-visual bg-white rounded-3 shadow-lg p-4 mx-auto" style="max-width: 400px;">
+            <div class="text-center mb-3">
+              <i class="bi bi-car-front-fill text-primary" style="font-size: 3rem;"></i>
+            </div>
+            <div class="row g-2">
+              <div class="col-4"><div class="parking-spot bg-success rounded p-2 text-center"><small class="text-white fw-bold">A1</small></div></div>
+              <div class="col-4"><div class="parking-spot bg-danger rounded p-2 text-center"><small class="text-white fw-bold">A2</small></div></div>
+              <div class="col-4"><div class="parking-spot bg-success rounded p-2 text-center"><small class="text-white fw-bold">A3</small></div></div>
+              <div class="col-4"><div class="parking-spot bg-warning rounded p-2 text-center"><small class="text-white fw-bold">B1</small></div></div>
+              <div class="col-4"><div class="parking-spot bg-success rounded p-2 text-center"><small class="text-white fw-bold">B2</small></div></div>
+              <div class="col-4"><div class="parking-spot bg-danger rounded p-2 text-center"><small class="text-white fw-bold">B3</small></div></div>
+            </div>
+            <div class="mt-3">
+              <small class="text-muted">
+                <span class="badge bg-success me-2">Available</span>
+                <span class="badge bg-warning me-2">Reserved</span>
+                <span class="badge bg-danger">Occupied</span>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<section id="features" class="py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center mb-5">
+        <h2 class="display-5 fw-bold text-dark mb-3">Why Drivers Love Us</h2>
+        <p class="lead text-muted">Skip the stress of finding parking. We make it easy to find, book, and pay for parking spots.</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card bg-white rounded-3 shadow-sm p-4 h-100 text-center border-0">
+          <div class="feature-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-geo-alt-fill text-primary" style="font-size: 2rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Find Nearby Spots</h4>
+          <p class="text-muted mb-0">Discover available parking spaces near your destination with GPS-powered search and live updates.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card bg-white rounded-3 shadow-sm p-4 h-100 text-center border-0">
+          <div class="feature-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-calendar-check-fill text-success" style="font-size: 2rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Reserve Instantly</h4>
+          <p class="text-muted mb-0">Book your parking spot in seconds and get instant confirmation. No more driving around looking for spaces.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card bg-white rounded-3 shadow-sm p-4 h-100 text-center border-0">
+          <div class="feature-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-shield-lock-fill text-warning" style="font-size: 2rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Easy Payment</h4>
+          <p class="text-muted mb-0">Pay securely with your preferred method. Quick, safe, and hassle-free transactions every time.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card bg-white rounded-3 shadow-sm p-4 h-100 text-center border-0">
+          <div class="feature-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-clock-fill text-info" style="font-size: 2rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Park Anytime</h4>
+          <p class="text-muted mb-0">Find and book parking 24/7, whether it's for work, shopping, or events. Always available when you need it.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card bg-white rounded-3 shadow-sm p-4 h-100 text-center border-0">
+          <div class="feature-icon bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-phone-fill text-danger" style="font-size: 2rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-3">On-the-Go Booking</h4>
+          <p class="text-muted mb-0">Book parking from your phone while driving. Mobile-optimized for quick and easy use on the road.</p>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card bg-white rounded-3 shadow-sm p-4 h-100 text-center border-0">
+          <div class="feature-icon bg-purple bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-headset text-purple" style="font-size: 2rem;"></i>
+          </div>
+          <h4 class="fw-bold mb-3">Help When Needed</h4>
+          <p class="text-muted mb-0">Stuck or need assistance? Our support team is here to help you find parking and resolve any issues quickly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-primary text-white">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold text-warning mb-2">500+</h3>
+          <p class="mb-0 text-light">Parking Locations</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold text-warning mb-2">10K+</h3>
+          <p class="mb-0 text-light">Happy Customers</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold text-warning mb-2">50K+</h3>
+          <p class="mb-0 text-light">Bookings Completed</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-item">
+          <h3 class="display-4 fw-bold text-warning mb-2">99.9%</h3>
+          <p class="mb-0 text-light">Uptime Guarantee</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h2 class="display-5 fw-bold mb-3">Ready to Stop Circling?</h2>
+        <p class="lead text-muted mb-4">Join thousands of drivers who never worry about finding parking again. Start booking your spots today!</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg px-5 py-3">
+            <i class="bi bi-person-plus me-2"></i>Sign Up Free
+          </a>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg px-5 py-3">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  pointer-events: none;
+}
+
+.parking-spot {
+  height: 40px;
+  transition: transform 0.2s ease;
+}
+
+.parking-spot:hover {
+  transform: scale(1.05);
+}
+
+.feature-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+.feature-icon {
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.1);
+}
+
+.text-purple {
+  color: #6f42c1 !important;
+}
+
+.bg-purple {
+  background-color: #6f42c1 !important;
+}
+
+.stat-item h3 {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Parking Lots{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="page-title mb-2">Available Parking Lots</h1>
+      <p class="lead text-muted">Choose from our selection of convenient parking locations</p>
+    </div>
+  </div>
+  
+  <div class="row g-4">
+    {% for lot in lots %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex flex-column">
+          <div class="mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+              <i class="bi bi-geo-alt-fill" style="font-size: 1.5rem;"></i>
+            </div>
+            <h5 class="card-title section-title mb-2">{{ lot.name }}</h5>
+          </div>
+          
+          <div class="mb-3 flex-grow-1">
+            <p class="card-text text-muted mb-2">
+              <i class="bi bi-geo me-2"></i>{{ lot.address.street }}, {{ lot.address.city }}
+            </p>
+            <p class="card-text text-muted mb-0">
+              <i class="bi bi-car-front me-2"></i>Available Spots: {{ lot.available_spots }}
+            </p>
+          </div>
+          
+          <div class="mt-auto">
+            <a href="{{ url_for('user.parking_detail', lot_id=lot.id) }}" class="btn btn-primary w-100 py-2">
+              <i class="bi bi-eye me-2"></i>View Spots
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="text-center py-5">
+        <div class="text-primary mb-3">
+          <i class="bi bi-geo-alt" style="font-size: 3rem;"></i>
+        </div>
+        <h3 class="mb-2">No Parking Lots Available</h3>
+        <p class="text-muted mb-0">There are currently no parking lots to display.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

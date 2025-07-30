@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% block title %}Settings - User{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <a href="{{ url_for('user.profile') }}" class="btn btn-link text-decoration-none mb-3 px-0">
+        <i class="bi bi-arrow-left me-2"></i>Back to Profile
+      </a>
+      <h1 class="page-title mb-2">Settings</h1>
+      <p class="lead text-muted">Manage your account settings and preferences</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Account Settings -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Account Settings</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                  <i class="bi bi-person-gear" style="font-size: 1.25rem;"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1">Profile Information</h6>
+                  <p class="text-muted small mb-2">Update your personal details and contact information</p>
+                  <a href="{{ url_for('user.edit_profile') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <div class="d-flex align-items-center">
+                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                  <i class="bi bi-key" style="font-size: 1.25rem;"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1">Password Security</h6>
+                  <p class="text-muted small mb-2">Change your password to keep your account secure</p>
+                  <a href="{{ url_for('user.change_password') }}" class="btn btn-sm btn-outline-warning">
+                    <i class="bi bi-shield-lock me-1"></i>Change Password
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Preferences -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Booking Preferences</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Coming Soon:</strong> Booking preferences will be available in a future update. 
+            You'll be able to set default booking duration, preferred parking spot types, and notification preferences.
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="emailNotifications" checked disabled>
+                <label class="form-check-label" for="emailNotifications">
+                  <strong>Email Notifications</strong><br>
+                  <small class="text-muted">Receive booking confirmations via email</small>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="smsNotifications" disabled>
+                <label class="form-check-label" for="smsNotifications">
+                  <strong>SMS Notifications</strong><br>
+                  <small class="text-muted">Receive booking updates via SMS</small>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="reminderAlerts" checked disabled>
+                <label class="form-check-label" for="reminderAlerts">
+                  <strong>Booking Reminders</strong><br>
+                  <small class="text-muted">Get reminders before your booking starts</small>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="promotionalEmails" disabled>
+                <label class="form-check-label" for="promotionalEmails">
+                  <strong>Promotional Offers</strong><br>
+                  <small class="text-muted">Receive special offers and discounts</small>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy & Data -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Privacy & Data</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12">
+              <div class="alert alert-secondary">
+                <h6 class="alert-heading">
+                  <i class="bi bi-shield-check me-2"></i>Data Privacy
+                </h6>
+                <p class="mb-2">Your personal information is secure and protected. We follow industry best practices to ensure your data privacy.</p>
+                <ul class="mb-0">
+                  <li>Your profile information is only visible to you and system administrators</li>
+                  <li>Booking data is encrypted and stored securely</li>
+                  <li>We never share your personal information with third parties</li>
+                  <li>You can request data deletion by contacting support</li>
+                </ul>
+<div class="mt-4">
+  <a href="{{ url_for('user.deactivate_account') }}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to deactivate your account? You can contact support to reactivate it later.')">
+    <i class="bi bi-person-x me-2"></i>Deactivate Account
+  </a>
+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Info Sidebar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Account Overview</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="text-muted">Account Type</h6>
+            <span class="badge bg-info">User</span>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Account Status</h6>
+            <span class="badge bg-{{ 'success' if current_user.is_active else 'danger' }}">
+              {{ 'Active' if current_user.is_active else 'Inactive' }}
+            </span>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Total Bookings</h6>
+            <p class="mb-0 fw-medium">{{ current_user.get_booking_history()|length }} booking{{ 's' if current_user.get_booking_history()|length != 1 else '' }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Member Since</h6>
+            <p class="mb-0 fw-medium">{{ current_user.created_at.strftime('%B %Y') if current_user.created_at else 'Unknown' }}</p>
+          </div>
+          
+          {% if current_user.last_login_at %}
+          <div class="mb-3">
+            <h6 class="text-muted">Last Login</h6>
+            <p class="mb-0 fw-medium">{{ current_user.last_login_at.strftime('%B %d, %Y') }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-primary">
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a href="{{ url_for('user.parking_list') }}" class="btn btn-outline-success">
+              <i class="bi bi-car-front me-2"></i>Book Parking
+            </a>
+            <a href="{{ url_for('user.booking_list') }}" class="btn btn-outline-info">
+              <i class="bi bi-list-check me-2"></i>My Bookings
+            </a>
+            <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-person me-2"></i>View Profile
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help & Support -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Help & Support</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">Need help with your bookings or have questions about using the parking system?</p>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-secondary btn-sm" disabled>
+              <i class="bi bi-question-circle me-2"></i>Help Center
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" disabled>
+              <i class="bi bi-envelope me-2"></i>Contact Support
+            </button>
+          </div>
+          <small class="text-muted mt-2 d-block">Support features coming soon!</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

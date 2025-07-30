@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Payment Receipt{% endblock %}
+
+{% block content %}
+<div class="container my-5" id="receipt-content">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="mb-4 text-center">Payment Receipt</h2>
+
+          <div class="mb-3 d-flex justify-content-between">
+            <span><strong>Receipt #:</strong> {{ payment.id }}</span>
+            <span><strong>Date:</strong> {{ payment.processed_at.strftime('%b %d, %Y %I:%M %p') if payment.processed_at else payment.created_at.strftime('%b %d, %Y %I:%M %p') }}</span>
+          </div>
+
+          <hr>
+
+          <h5 class="mt-4">Payer Information</h5>
+          <p class="mb-1"><strong>Name:</strong> {{ current_user.full_name or current_user.email.split('@')[0] }}</p>
+          <p class="mb-1"><strong>Email:</strong> {{ current_user.email }}</p>
+
+          <h5 class="mt-4">Booking Details</h5>
+          {% if booking.spot and booking.spot.parking_lot %}
+          <p class="mb-1"><strong>Parking Lot:</strong> {{ booking.spot.parking_lot.name }}</p>
+          {% endif %}
+          {% if booking.spot %}
+          <p class="mb-1"><strong>Spot:</strong> {{ booking.spot.display_name if booking.spot.display_name else booking.spot.spot_number }}</p>
+          {% endif %}
+          <p class="mb-1"><strong>Start:</strong> {{ booking.start_time.strftime('%b %d, %Y %I:%M %p') }}</p>
+          <p class="mb-1"><strong>End:</strong> {{ booking.end_time.strftime('%b %d, %Y %I:%M %p') }}</p>
+
+          <h5 class="mt-4">Payment Details</h5>
+          <p class="mb-1"><strong>Amount Paid:</strong> ${{ '{:.2f}'.format(payment.amount) }}</p>
+          <p class="mb-1"><strong>Method:</strong> {{ payment.payment_method.replace('_', ' ').title() }}</p>
+          <p class="mb-1"><strong>Status:</strong> {{ payment.status.title() }}</p>
+
+          <hr>
+          <p class="text-center text-muted">Thank you for your payment!</p>
+        </div>
+      </div>
+      <div class="text-center mt-4 d-print-none">
+        <button class="btn btn-primary" onclick="window.print();">
+          <i class="bi bi-printer me-2"></i>Print Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

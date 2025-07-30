@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}My Parking Lots - Manager{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <a href="{{ url_for('manager.dashboard') }}" class="btn btn-link text-decoration-none mb-3 px-0">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+      </a>
+      <h1 class="page-title mb-2">My Parking Lots</h1>
+      <p class="lead text-muted">Manage your assigned parking facilities</p>
+    </div>
+  </div>
+  
+  <div class="row g-4">
+    {% for lot in managed_lots %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex flex-column">
+          <div class="mb-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+              <i class="bi bi-geo-alt-fill" style="font-size: 1.5rem;"></i>
+            </div>
+            <h5 class="card-title section-title mb-2">{{ lot.name }}</h5>
+          </div>
+          
+          <div class="flex-grow-1">
+            <p class="card-text text-muted mb-2">
+              <i class="bi bi-geo me-2"></i>{{ lot.address.street }}, {{ lot.address.city }}
+            </p>
+            <p class="card-text text-muted mb-2">
+              <i class="bi bi-car-front me-2"></i>{{ lot.available_spots }}/{{ lot.total_spots }} spots available
+            </p>
+            <p class="card-text text-muted mb-0">
+              <i class="bi bi-currency-dollar me-2"></i>${{ lot.hourly_rate }}/hour
+            </p>
+          </div>
+          
+          <div class="mt-auto pt-3">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('manager.lot_detail', lot_id=lot.id) }}" class="btn btn-primary">
+                <i class="bi bi-eye me-2"></i>Manage Lot
+              </a>
+              <div class="btn-group" role="group">
+                <a href="{{ url_for('manager.lot_spots', lot_id=lot.id) }}" class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-grid-3x3"></i> Spots
+                </a>
+                <a href="{{ url_for('manager.edit_lot', lot_id=lot.id) }}" class="btn btn-outline-info btn-sm">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <form method="POST" action="{{ url_for('manager.toggle_lot_status', lot_id=lot.id) }}" class="d-inline">
+                  <button type="submit" class="btn btn-outline-{{ 'danger' if lot.is_active else 'success' }} btn-sm" 
+                          onclick="return confirm('Are you sure you want to {{ 'deactivate' if lot.is_active else 'activate' }} this lot?')">
+                    <i class="bi bi-{{ 'pause' if lot.is_active else 'play' }}"></i> {{ 'Disable' if lot.is_active else 'Enable' }}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="text-center py-5">
+        <div class="text-primary mb-3">
+          <i class="bi bi-geo-alt" style="font-size: 3rem;"></i>
+        </div>
+        <h3 class="mb-2">No Parking Lots Assigned</h3>
+        <p class="text-muted mb-0">You are not currently assigned to manage any parking lots.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

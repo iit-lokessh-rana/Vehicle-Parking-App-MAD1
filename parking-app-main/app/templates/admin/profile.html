@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% block title %}Admin Profile{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="page-title mb-2">Administrator Profile</h1>
+      <p class="lead text-muted">Manage your administrative account and view system overview</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="section-title mb-0">Profile Information</h5>
+            <a href="{{ url_for('admin.edit_profile') }}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-pencil me-2"></i>Edit Profile
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">First Name</h6>
+                <p class="mb-0 fw-medium">{{ current_user.first_name or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Last Name</h6>
+                <p class="mb-0 fw-medium">{{ current_user.last_name or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Email Address</h6>
+                <p class="mb-0 fw-medium">{{ current_user.email }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Phone Number</h6>
+                <p class="mb-0 fw-medium">{{ current_user.phone_number or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Account Type</h6>
+                <span class="badge bg-danger">Administrator</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Account Status</h6>
+                <span class="badge bg-{{ 'success' if current_user.is_active else 'danger' }}">
+                  {{ 'Active' if current_user.is_active else 'Inactive' }}
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Administrator Since</h6>
+                <p class="mb-0 fw-medium">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Unknown' }}</p>
+              </div>
+            </div>
+            {% if current_user.last_login_at %}
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Last Login</h6>
+                <p class="mb-0 fw-medium">{{ current_user.last_login_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- System Overview -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="section-title mb-0">System Overview</h5>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-speedometer2 me-2"></i>Full Dashboard
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center mb-4">
+            <div class="col-md-3 col-6">
+              <div class="mb-3">
+                <h3 class="text-primary mb-1">{{ total_users }}</h3>
+                <small class="text-muted">Total Users</small>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="mb-3">
+                <h3 class="text-success mb-1">{{ total_lots }}</h3>
+                <small class="text-muted">Parking Lots</small>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="mb-3">
+                <h3 class="text-info mb-1">{{ total_bookings }}</h3>
+                <small class="text-muted">Total Bookings</small>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="mb-3">
+                <h3 class="text-warning mb-1">${{ "%.0f"|format(total_revenue) }}</h3>
+                <small class="text-muted">Total Revenue</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-3">Recent Users</h6>
+              {% if recent_users %}
+                {% for user in recent_users %}
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                  <div>
+                    <h6 class="mb-1">{{ user.full_name or user.email }}</h6>
+                    <small class="text-muted">
+                      {{ user.email }}
+                      {% if user.is_admin %}
+                        <span class="badge bg-danger ms-1">Admin</span>
+                      {% elif user.managed_lots %}
+                        <span class="badge bg-warning ms-1">Manager</span>
+                      {% else %}
+                        <span class="badge bg-info ms-1">User</span>
+                      {% endif %}
+                    </small>
+                  </div>
+                  <small class="text-muted">{{ user.created_at.strftime('%m/%d') if user.created_at else 'Unknown' }}</small>
+                </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted">No recent users</p>
+              {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+              <h6 class="text-muted mb-3">Recent Bookings</h6>
+              {% if recent_bookings %}
+                {% for booking in recent_bookings %}
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                  <div>
+                    <h6 class="mb-1">{{ booking.parking_spot.parking_lot.name }}</h6>
+                    <small class="text-muted">
+                      {{ booking.user.full_name or booking.user.email }} • 
+                      Spot #{{ booking.parking_spot.spot_number }}
+                    </small>
+                  </div>
+                  <div class="text-end">
+                    <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' }}">
+                      {{ booking.status.title() }}
+                    </span>
+                    <div class="small text-muted">${{ "%.2f"|format(booking.total_amount) }}</div>
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted">No recent bookings</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Sidebar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('admin.edit_profile') }}" class="btn btn-outline-primary">
+              <i class="bi bi-person-gear me-2"></i>Edit Profile
+            </a>
+            <a href="{{ url_for('admin.change_password') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-key me-2"></i>Change Password
+            </a>
+            <a href="{{ url_for('admin.settings') }}" class="btn btn-outline-info">
+              <i class="bi bi-gear me-2"></i>Settings
+            </a>
+            <hr class="my-3">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-success">
+              <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+            </a>
+            <a href="{{ url_for('admin.user_list') }}" class="btn btn-outline-warning">
+              <i class="bi bi-people me-2"></i>Manage Users
+            </a>
+            <a href="{{ url_for('admin.lot_list') }}" class="btn btn-outline-primary">
+              <i class="bi bi-building me-2"></i>Manage Lots
+            </a>
+            <a href="{{ url_for('admin.revenue_reports') }}" class="btn btn-outline-info">
+              <i class="bi bi-graph-up me-2"></i>Revenue Reports
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">System Status</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">System Health</span>
+              <span class="badge bg-success">Operational</span>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Database</span>
+              <span class="badge bg-success">Connected</span>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Active Lots</span>
+              <span class="fw-medium">{{ recent_lots|length }}/{{ total_lots }}</span>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Recent Activity</span>
+              <span class="fw-medium">{{ recent_bookings|length }} bookings</span>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Admin Access:</strong> You have full system privileges and can manage all users, parking lots, and system settings.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

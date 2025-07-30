@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Deactivate Account - Confirmation{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 text-center">
+          <h2 class="mb-3 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Deactivate Account</h2>
+          <p class="lead">Are you sure you want to deactivate your account?</p>
+          <p class="text-muted small">Your profile will be disabled and you will no longer be able to log in until you contact support to reactivate it. Your existing bookings and payment history will be retained.</p>
+          <form method="post">
+            <button type="submit" class="btn btn-danger me-2">Yes, Deactivate</button>
+            <a href="{{ url_for('user.settings') }}" class="btn btn-outline-secondary">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

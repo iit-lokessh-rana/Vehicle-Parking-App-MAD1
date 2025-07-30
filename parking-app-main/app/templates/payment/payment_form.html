@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - Parking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Development Notice -->
+            <div class="alert alert-warning border-0 mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>
+                        <strong>Development Mode:</strong> This is a test environment. 
+                        Enter any valid card details (e.g., 4111 1111 1111 1111) for dummy payment processing.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="d-flex justify-content-center">
+                        <div class="progress-steps d-flex align-items-center">
+                            <div class="step completed">
+                                <div class="step-circle">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <span class="step-label">Select Spot</span>
+                            </div>
+                            <div class="step-line completed"></div>
+                            <div class="step active">
+                                <div class="step-circle">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+                                <span class="step-label">Payment</span>
+                            </div>
+                            <div class="step-line"></div>
+                            <div class="step">
+                                <div class="step-circle">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                                <span class="step-label">Confirmation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Booking Summary -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-receipt me-2"></i>Booking Summary
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if booking %}
+                            <div class="booking-details">
+                                <div class="detail-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Parking Lot:</span>
+                                        <span class="fw-semibold">{{ booking.spot.parking_lot.name }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Spot:</span>
+                                        <span class="fw-semibold">#{{ booking.spot.spot_number }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Vehicle:</span>
+                                        <span class="fw-semibold">{{ booking.vehicle_plate }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Start Time:</span>
+                                        <span class="fw-semibold">{{ booking.start_time.strftime('%m/%d/%Y %I:%M %p') }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Duration:</span>
+                                        <span class="fw-semibold">{{ booking.duration_hours }} hours</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Rate:</span>
+                                        <span class="fw-semibold">${{ "%.2f"|format(booking.spot.parking_lot.hourly_rate) }}/hr</span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="detail-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-bold">Total Amount:</span>
+                                        <span class="fw-bold text-primary fs-5">${{ "%.2f"|format(booking.calculate_amount()) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check text-success mb-2" style="font-size: 2rem;"></i>
+                            <h6 class="fw-bold">Secure Payment</h6>
+                            <small class="text-muted">Your payment information is encrypted and secure. We never store your card details.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-credit-card me-2"></i>Payment Information
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form method="POST" id="payment-form">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Payment Method Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Payment Method</label>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="payment_method" name="payment_method">
+                                            {% for value, label in form.payment_method.choices %}
+                                            <option value="{{ value }}" {% if form.payment_method.data == value %}selected{% elif value == 'credit_card' and form.payment_method.data is none %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                        <label for="payment_method">Select your preferred payment method</label>
+                                    </div>
+                                </div>
+
+                                <!-- Card Information (shown for card payments) -->
+                                <div id="card-details" class="card-payment-section">
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.card_number(class="form-control", placeholder="1234 5678 9012 3456", maxlength="19") }}
+                                                {{ form.card_number.label(class="form-label") }}
+                                            </div>
+                                            {% if form.card_number.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.card_number.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.expiry_month(class="form-control") }}
+                                                {{ form.expiry_month.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.expiry_year(class="form-control") }}
+                                                {{ form.expiry_year.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.cvv(class="form-control", placeholder="123", maxlength="4") }}
+                                                {{ form.cvv.label(class="form-label") }}
+                                            </div>
+                                            {% if form.cvv.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.cvv.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Billing Information -->
+                                <div id="billing-info" class="card-payment-section">
+                                    <h6 class="fw-semibold mb-3">Billing Information</h6>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.billing_name(class="form-control", placeholder="John Doe") }}
+                                                {{ form.billing_name.label(class="form-label") }}
+                                            </div>
+                                            {% if form.billing_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.billing_name.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.billing_email(class="form-control", placeholder="john@example.com") }}
+                                                {{ form.billing_email.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-floating">
+                                            {{ form.billing_address(class="form-control", placeholder="123 Main St") }}
+                                            {{ form.billing_address.label(class="form-label") }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.billing_city(class="form-control", placeholder="New York") }}
+                                                {{ form.billing_city.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.billing_state(class="form-control", placeholder="NY") }}
+                                                {{ form.billing_state.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-floating">
+                                                {{ form.billing_zip(class="form-control", placeholder="10001") }}
+                                                {{ form.billing_zip.label(class="form-label") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Terms and Conditions -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        {{ form.accept_terms(class="form-check-input") }}
+                                        <label class="form-check-label" for="{{ form.accept_terms.id }}">
+                                            I accept the <a href="#" class="text-decoration-none">terms and conditions</a> 
+                                            and <a href="#" class="text-decoration-none">cancellation policy</a>
+                                        </label>
+                                    </div>
+                                    {% if form.accept_terms.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.accept_terms.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                        <i class="bi bi-arrow-left me-2"></i>Back
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-lg px-5" id="submit-payment">
+                                        <i class="bi bi-lock-fill me-2"></i>
+                                        <span class="button-text">Complete Payment</span>
+                                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Progress Steps */
+.progress-steps {
+    max-width: 600px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step.completed .step-circle {
+    background-color: #28a745;
+    color: white;
+}
+
+.step.active .step-circle {
+    background-color: #007bff;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.step.completed .step-label,
+.step.active .step-label {
+    color: #495057;
+}
+
+.step-line {
+    width: 100px;
+    height: 2px;
+    background-color: #e9ecef;
+    margin: 0 20px;
+    margin-top: 25px;
+}
+
+.step-line.completed {
+    background-color: #28a745;
+}
+
+/* Payment Methods */
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-select {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+}
+
+/* Card Details */
+.card-payment-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.card-payment-section.show {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Enhancements */
+.form-floating > .form-control:focus ~ label {
+    color: #007bff;
+}
+
+.form-floating > .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Loading State */
+.btn:disabled {
+    opacity: 0.7;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethodSelect = document.getElementById('payment_method');
+    const cardDetails = document.getElementById('card-details');
+    const billingInfo = document.getElementById('billing-info');
+    const submitButton = document.getElementById('submit-payment');
+    const form = document.getElementById('payment-form');
+    
+    // Show/hide card details based on payment method
+    function toggleCardDetails() {
+        const selectedMethod = paymentMethodSelect.value;
+        
+        if (selectedMethod === 'credit_card' || selectedMethod === 'debit_card') {
+            cardDetails.classList.add('show');
+            billingInfo.classList.add('show');
+        } else {
+            cardDetails.classList.remove('show');
+            billingInfo.classList.remove('show');
+        }
+    }
+    
+    // Initialize on page load
+    toggleCardDetails();
+    
+    // Add event listener
+    paymentMethodSelect.addEventListener('change', toggleCardDetails);
+    
+    // Format card number input
+    const cardNumberInput = document.querySelector('input[name="card_number"]');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+    }
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        submitButton.disabled = true;
+        submitButton.querySelector('.button-text').textContent = 'Processing...';
+        submitButton.querySelector('.spinner-border').classList.remove('d-none');
+    });
+});
+</script>
+{% endblock %}

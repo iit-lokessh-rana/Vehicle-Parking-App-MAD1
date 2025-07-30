@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile - User{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <a href="{{ url_for('user.profile') }}" class="btn btn-link text-decoration-none mb-3 px-0">
+        <i class="bi bi-arrow-left me-2"></i>Back to Profile
+      </a>
+      <h1 class="page-title mb-2">Edit Profile</h1>
+      <p class="lead text-muted">Update your personal information</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Personal Information</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.first_name.label(class="form-label") }}
+                  {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else "")) }}
+                  {% if form.first_name.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.last_name.label(class="form-label") }}
+                  {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                  {% if form.last_name.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.email.label(class="form-label") }}
+                  {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                  {% if form.email.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in form.email.errors %}{{ error }}{% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">This email will be used for login and notifications.</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.phone_number.label(class="form-label") }}
+                  {{ form.phone_number(class="form-control" + (" is-invalid" if form.phone_number.errors else ""), placeholder="(555) 123-4567") }}
+                  {% if form.phone_number.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in form.phone_number.errors %}{{ error }}{% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="form-text">Optional contact number for notifications.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+              </a>
+              {{ form.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Information Sidebar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Current Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="text-muted">Current Name</h6>
+            <p class="mb-0">{{ current_user.full_name or 'Not provided' }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Current Email</h6>
+            <p class="mb-0">{{ current_user.email }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Current Phone</h6>
+            <p class="mb-0">{{ current_user.phone_number or 'Not provided' }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Account Type</h6>
+            <span class="badge bg-info">User</span>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Account Status</h6>
+            <span class="badge bg-{{ 'success' if current_user.is_active else 'danger' }}">
+              {{ 'Active' if current_user.is_active else 'Inactive' }}
+            </span>
+          </div>
+          
+          <hr>
+          
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Note:</strong> Changes to your email address will require you to log in again with the new email.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Account Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('user.change_password') }}" class="btn btn-outline-warning">
+              <i class="bi bi-key me-2"></i>Change Password
+            </a>
+            <a href="{{ url_for('user.settings') }}" class="btn btn-outline-info">
+              <i class="bi bi-gear me-2"></i>Settings
+            </a>
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-primary">
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a href="{{ url_for('user.booking_list') }}" class="btn btn-outline-success">
+              <i class="bi bi-list-check me-2"></i>My Bookings
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - Manager{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="page-title mb-2">My Profile</h1>
+      <p class="lead text-muted">Manage your personal information and account settings</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="section-title mb-0">Profile Information</h5>
+            <a href="{{ url_for('manager.edit_profile') }}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-pencil me-2"></i>Edit Profile
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">First Name</h6>
+                <p class="mb-0 fw-medium">{{ current_user.first_name or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Last Name</h6>
+                <p class="mb-0 fw-medium">{{ current_user.last_name or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Email Address</h6>
+                <p class="mb-0 fw-medium">{{ current_user.email }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Phone Number</h6>
+                <p class="mb-0 fw-medium">{{ current_user.phone_number or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Account Status</h6>
+                <span class="badge bg-{{ 'success' if current_user.is_active else 'danger' }}">
+                  {{ 'Active' if current_user.is_active else 'Inactive' }}
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Member Since</h6>
+                <p class="mb-0 fw-medium">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Unknown' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Managed Lots Information -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Managed Parking Lots</h5>
+        </div>
+        <div class="card-body">
+          {% if current_user.managed_lots %}
+            <div class="row">
+              {% for lot in current_user.managed_lots %}
+              <div class="col-md-6 mb-3">
+                <div class="card border border-primary border-opacity-25">
+                  <div class="card-body">
+                    <h6 class="card-title mb-2">{{ lot.name }}</h6>
+                    <p class="card-text text-muted small mb-2">
+                      {{ lot.address.street }}, {{ lot.address.city }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <small class="text-muted">{{ lot.available_spots }}/{{ lot.total_spots }} available</small>
+                      <span class="badge bg-{{ 'success' if lot.is_active else 'secondary' }}">
+                        {{ 'Active' if lot.is_active else 'Inactive' }}
+                      </span>
+                    </div>
+                    <div class="mt-2">
+                      <a href="{{ url_for('manager.lot_detail', lot_id=lot.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye me-1"></i>Manage
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <div class="text-muted mb-3">
+                <i class="bi bi-building" style="font-size: 3rem;"></i>
+              </div>
+              <h6 class="mb-2">No Managed Lots</h6>
+              <p class="text-muted mb-0">You are not currently assigned to manage any parking lots.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Sidebar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('manager.edit_profile') }}" class="btn btn-outline-primary">
+              <i class="bi bi-person-gear me-2"></i>Edit Profile
+            </a>
+            <a href="{{ url_for('manager.change_password') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-key me-2"></i>Change Password
+            </a>
+            <a href="{{ url_for('manager.settings') }}" class="btn btn-outline-info">
+              <i class="bi bi-gear me-2"></i>Settings
+            </a>
+            <hr class="my-3">
+            <a href="{{ url_for('manager.dashboard') }}" class="btn btn-outline-success">
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a href="{{ url_for('manager.managed_lots') }}" class="btn btn-outline-warning">
+              <i class="bi bi-building me-2"></i>My Lots
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Statistics -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Account Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="mb-3">
+                <h4 class="text-primary mb-1">{{ current_user.managed_lots|length }}</h4>
+                <small class="text-muted">Managed Lots</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="mb-3">
+                <h4 class="text-success mb-1">
+                  {% set total_spots = current_user.managed_lots|sum(attribute='total_spots') %}
+                  {{ total_spots or 0 }}
+                </h4>
+                <small class="text-muted">Total Spots</small>
+              </div>
+            </div>
+          </div>
+          {% if current_user.last_login_at %}
+          <hr class="my-3">
+          <div class="text-center">
+            <small class="text-muted">
+              Last login: {{ current_user.last_login_at.strftime('%B %d, %Y at %I:%M %p') }}
+            </small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

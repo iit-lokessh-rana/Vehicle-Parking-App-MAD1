@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}{{ lot.name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <a href="{{ url_for('user.parking_list') }}" class="btn btn-link text-decoration-none mb-3 px-0">
+        <i class="bi bi-arrow-left me-2"></i>Back to lots
+      </a>
+      <h1 class="page-title mb-2">{{ lot.name }}</h1>
+      <p class="lead text-muted mb-0">{{ lot.address.street }}, {{ lot.address.city }}, {{ lot.address.state }}</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Available Spots</h5>
+        </div>
+        <div class="card-body">
+          {% if available_spots %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Spot #</th>
+                    <th>Type</th>
+                    <th>Price /hr</th>
+                    <th>Charger</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for spot in available_spots %}
+                  <tr>
+                    <td>
+                      <span class="badge bg-light text-dark">{{ spot.spot_number }}</span>
+                    </td>
+                    <td class="text-capitalize">{{ spot.spot_type }}</td>
+                    <td class="fw-medium">{{ lot.hourly_rate }} {{ lot.currency or 'USD' }}</td>
+                    <td>
+                      {% if spot.has_charger %}
+                        <span class="badge bg-success">Yes</span>
+                      {% else %}
+                        <span class="badge bg-secondary">No</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-primary px-3" data-bs-toggle="modal" data-bs-target="#bookModal" 
+                              data-spot-id="{{ spot.id }}" data-spot-number="{{ spot.spot_number }}">
+                        Book Now
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <div class="text-primary mb-3">
+                <i class="bi bi-car-front" style="font-size: 3rem;"></i>
+              </div>
+              <h5 class="mb-2">No Spots Available</h5>
+              <p class="text-muted mb-0">There are currently no available spots in this parking lot.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Lot Information</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0 py-3 border-0">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Total Spots</span>
+                <span class="fw-medium">{{ lot.total_spots }}</span>
+              </div>
+            </li>
+            <li class="list-group-item px-0 py-3 border-0">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Available</span>
+                <span class="fw-medium">{{ lot.available_spots }}</span>
+              </div>
+            </li>
+            <li class="list-group-item px-0 py-3 border-0">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Hourly Rate</span>
+                <span class="fw-medium">{{ lot.hourly_rate }} {{ lot.currency or 'USD' }}</span>
+              </div>
+            </li>
+            <li class="list-group-item px-0 py-3 border-0">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Contact</span>
+                <span class="fw-medium">{{ lot.manager_phone or 'N/A' }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body text-center">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 64px; height: 64px;">
+            <i class="bi bi-geo-alt-fill" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="mb-2">Location</h5>
+          <p class="text-muted mb-0">{{ lot.address.street }}, {{ lot.address.city }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-sm">
+      <form method="POST" action="{{ url_for('user.parking_detail', lot_id=lot.id) }}">
+        {{ form.hidden_tag() }}
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title" id="bookModalLabel">Book Parking Spot</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="mb-4">
+            <label class="form-label fw-medium mb-2">Spot Number</label>
+            <input type="text" class="form-control form-control-lg" id="spot-number" readonly>
+            {{ form.parking_spot_id(type="hidden", id="spot-id") }}
+          </div>
+          <div class="mb-4">
+            {{ form.vehicle_plate.label(class="form-label fw-medium mb-2") }}
+            {{ form.vehicle_plate(class="form-control form-control-lg", placeholder="Enter vehicle plate number") }}
+          </div>
+          <div class="mb-4">
+            {{ form.start_time.label(class="form-label fw-medium mb-2") }}
+            {{ form.start_time(class="form-control form-control-lg", placeholder="Select start time", id="start-time-input") }}
+          </div>
+          <div class="mb-4">
+            {{ form.duration.label(class="form-label fw-medium mb-2") }}
+            {{ form.duration(class="form-select form-select-lg") }}
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-lg btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+          {{ form.submit(class="btn btn-lg btn-primary px-4") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  // Set minimum datetime to current time
+  document.addEventListener('DOMContentLoaded', function() {
+    var startTimeInput = document.getElementById('start-time-input');
+    if (startTimeInput) {
+      var now = new Date();
+      // Format datetime for datetime-local input (YYYY-MM-DDTHH:MM)
+      var year = now.getFullYear();
+      var month = String(now.getMonth() + 1).padStart(2, '0');
+      var day = String(now.getDate()).padStart(2, '0');
+      var hours = String(now.getHours()).padStart(2, '0');
+      var minutes = String(now.getMinutes()).padStart(2, '0');
+      var minDateTime = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
+      
+      startTimeInput.setAttribute('min', minDateTime);
+    }
+  });
+
+  // Populate modal with spot info
+  var bookModal = document.getElementById('bookModal');
+  bookModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    var spotId = button.getAttribute('data-spot-id');
+    var spotNumber = button.getAttribute('data-spot-number');
+    
+    var spotIdInput = document.getElementById('spot-id');
+    var spotNumberInput = document.getElementById('spot-number');
+    
+    spotIdInput.value = spotId;
+    spotNumberInput.value = spotNumber;
+  });
+</script>
+{% endblock %}

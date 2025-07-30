@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - User{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="page-title mb-2">My Profile</h1>
+      <p class="lead text-muted">Manage your personal information and account settings</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Profile Information -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="section-title mb-0">Profile Information</h5>
+            <a href="{{ url_for('user.edit_profile') }}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-pencil me-2"></i>Edit Profile
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">First Name</h6>
+                <p class="mb-0 fw-medium">{{ current_user.first_name or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Last Name</h6>
+                <p class="mb-0 fw-medium">{{ current_user.last_name or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Email Address</h6>
+                <p class="mb-0 fw-medium">{{ current_user.email }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Phone Number</h6>
+                <p class="mb-0 fw-medium">{{ current_user.phone_number or 'Not provided' }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Account Status</h6>
+                <span class="badge bg-{{ 'success' if current_user.is_active else 'danger' }}">
+                  {{ 'Active' if current_user.is_active else 'Inactive' }}
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted mb-1">Member Since</h6>
+                <p class="mb-0 fw-medium">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'Unknown' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking History Summary -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="section-title mb-0">Booking Activity</h5>
+            <a href="{{ url_for('user.booking_list') }}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-list me-2"></i>View All Bookings
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          {% set recent_bookings = current_user.get_booking_history(5) %}
+          {% if recent_bookings %}
+            <div class="row mb-3">
+              <div class="col-12">
+                <h6 class="text-muted mb-3">Recent Bookings</h6>
+              </div>
+            </div>
+            {% for booking in recent_bookings %}
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <div>
+                <h6 class="mb-1">{{ booking.spot.parking_lot.name }}</h6>
+                <small class="text-muted">
+                  Spot #{{ booking.spot.spot_number }} • 
+                  {{ booking.start_time.strftime('%b %d, %Y at %I:%M %p') }}
+                </small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' }}">
+                  {{ booking.status.title() }}
+                </span>
+                <div class="small text-muted mt-1">${{ "%.2f"|format(booking.total_amount) }}</div>
+              </div>
+            </div>
+            {% endfor %}
+            {% if current_user.get_booking_history()|length > 5 %}
+            <div class="text-center mt-3">
+              <a href="{{ url_for('user.booking_list') }}" class="btn btn-outline-primary btn-sm">
+                View {{ current_user.get_booking_history()|length - 5 }} More Bookings
+              </a>
+            </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <div class="text-muted mb-3">
+                <i class="bi bi-calendar-x" style="font-size: 3rem;"></i>
+              </div>
+              <h6 class="mb-2">No Bookings Yet</h6>
+              <p class="text-muted mb-3">You haven't made any parking reservations yet.</p>
+              <a href="{{ url_for('user.parking_list') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Book Your First Spot
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Sidebar -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('user.edit_profile') }}" class="btn btn-outline-primary">
+              <i class="bi bi-person-gear me-2"></i>Edit Profile
+            </a>
+            <a href="{{ url_for('user.change_password') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-key me-2"></i>Change Password
+            </a>
+            <a href="{{ url_for('user.settings') }}" class="btn btn-outline-info">
+              <i class="bi bi-gear me-2"></i>Settings
+            </a>
+            <hr class="my-3">
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-success">
+              <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </a>
+            <a href="{{ url_for('user.parking_list') }}" class="btn btn-outline-warning">
+              <i class="bi bi-car-front me-2"></i>Book Parking
+            </a>
+            <a href="{{ url_for('user.booking_list') }}" class="btn btn-outline-primary">
+              <i class="bi bi-list-check me-2"></i>My Bookings
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Statistics -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Account Statistics</h5>
+        </div>
+        <div class="card-body">
+          {% set all_bookings = current_user.get_booking_history(100) %}
+          {% set total_spent = all_bookings|sum(attribute='total_amount') %}
+          {% set confirmed_bookings = all_bookings|selectattr('status', 'equalto', 'confirmed')|list %}
+          
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="mb-3">
+                <h4 class="text-primary mb-1">{{ all_bookings|length }}</h4>
+                <small class="text-muted">Total Bookings</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="mb-3">
+                <h4 class="text-success mb-1">${{ "%.0f"|format(total_spent or 0) }}</h4>
+                <small class="text-muted">Total Spent</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="mb-3">
+                <h4 class="text-info mb-1">{{ confirmed_bookings|length }}</h4>
+                <small class="text-muted">Confirmed</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="mb-3">
+                <h4 class="text-warning mb-1">
+                  {% set pending_bookings = all_bookings|selectattr('status', 'equalto', 'pending')|list %}
+                  {{ pending_bookings|length }}
+                </h4>
+                <small class="text-muted">Pending</small>
+              </div>
+            </div>
+          </div>
+          
+          {% if current_user.last_login_at %}
+          <hr class="my-3">
+          <div class="text-center">
+            <small class="text-muted">
+              Last login: {{ current_user.last_login_at.strftime('%B %d, %Y at %I:%M %p') }}
+            </small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

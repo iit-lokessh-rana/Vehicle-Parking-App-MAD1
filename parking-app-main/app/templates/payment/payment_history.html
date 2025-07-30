@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}Payment History - Parking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold mb-2">Payment History</h1>
+                    <p class="text-muted mb-0">View all your payment transactions and receipts</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="status-filter">
+                                <option value="">All Statuses</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                                <option value="failed">Failed</option>
+                                <option value="refunded">Refunded</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select" id="method-filter">
+                                <option value="">All Methods</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="debit_card">Debit Card</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="apple_pay">Apple Pay</option>
+                                <option value="google_pay">Google Pay</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-select" id="date-filter">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="applyFilters()">
+                                <i class="bi bi-funnel me-2"></i>Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="bi bi-credit-card text-primary mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="fw-bold">{{ payments.total }}</h5>
+                            <small class="text-muted">Total Payments</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="bi bi-check-circle text-success mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="fw-bold">{{ payments.items|selectattr('status', 'equalto', 'completed')|list|length }}</h5>
+                            <small class="text-muted">Completed</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="bi bi-clock text-warning mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="fw-bold">{{ payments.items|selectattr('status', 'equalto', 'pending')|list|length }}</h5>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="bi bi-currency-dollar text-info mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="fw-bold">${{ "%.2f"|format(payments.items|selectattr('status', 'equalto', 'completed')|map(attribute='amount')|sum) }}</h5>
+                            <small class="text-muted">Total Spent</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment List -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>Payment Transactions
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if payments.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Booking</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments.items %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">{{ payment.reference_number }}</div>
+                                        {% if payment.gateway_transaction_id %}
+                                        <small class="text-muted">{{ payment.gateway_transaction_id[:20] }}...</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">#{{ payment.booking.id }}</div>
+                                        <small class="text-muted">{{ payment.booking.spot.parking_lot.name }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">${{ "%.2f"|format(payment.amount) }}</div>
+                                        {% if payment.refunded_amount %}
+                                        <small class="text-danger">-${{ "%.2f"|format(payment.refunded_amount) }} refunded</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if payment.payment_method == 'credit_card' %}
+                                                <i class="bi bi-credit-card-2-front me-2"></i>
+                                            {% elif payment.payment_method == 'debit_card' %}
+                                                <i class="bi bi-credit-card me-2"></i>
+                                            {% elif payment.payment_method == 'paypal' %}
+                                                <i class="bi bi-paypal me-2"></i>
+                                            {% elif payment.payment_method == 'apple_pay' %}
+                                                <i class="bi bi-apple me-2"></i>
+                                            {% elif payment.payment_method == 'google_pay' %}
+                                                <i class="bi bi-google me-2"></i>
+                                            {% endif %}
+                                            {{ payment.payment_method.replace('_', ' ').title() }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if payment.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif payment.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif payment.status == 'failed' %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% elif payment.status == 'refunded' %}
+                                            <span class="badge bg-info">Refunded</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ payment.status.title() }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>{{ payment.created_at.strftime('%m/%d/%Y') }}</div>
+                                        <small class="text-muted">{{ payment.created_at.strftime('%I:%M %p') }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('payment.payment_receipt', payment_id=payment.id) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="View Receipt">
+                                                <i class="bi bi-receipt"></i>
+                                            </a>
+                                            {% if payment.status == 'completed' and current_user.is_admin %}
+                                             <a href="{{ url_for('payment.process_refund', payment_id=payment.id) }}" 
+                                                class="btn btn-sm btn-outline-warning" title="Process Refund">
+                                                 <i class="bi bi-arrow-return-left"></i>
+                                             </a>
+                                             {% elif payment.status == 'completed' and not current_user.is_admin %}
+                                             <a href="{{ url_for('payment.request_refund', payment_id=payment.id) }}" 
+                                                class="btn btn-sm btn-outline-warning" title="Request Refund">
+                                                 <i class="bi bi-arrow-counterclockwise"></i>
+                                             </a>
+                                             {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-credit-card text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted">No Payment History</h5>
+                        <p class="text-muted mb-4">You haven't made any payments yet.</p>
+                        <a href="{{ url_for('user.dashboard') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Make Your First Booking
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if payments.pages > 1 %}
+            <nav aria-label="Payment history pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if payments.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('payment.payment_history', page=payments.prev_num) }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in payments.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != payments.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('payment.payment_history', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if payments.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('payment.payment_history', page=payments.next_num) }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Payment Details Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="paymentDetailsContent">
+                <!-- Payment details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i>Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Table enhancements */
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Button group */
+.btn-group .btn {
+    border-radius: 0.375rem;
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Statistics cards */
+.card {
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+}
+</style>
+
+<script>
+function applyFilters() {
+    const status = document.getElementById('status-filter').value;
+    const method = document.getElementById('method-filter').value;
+    const date = document.getElementById('date-filter').value;
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (method) params.append('method', method);
+    if (date) params.append('date', date);
+    
+    // Redirect with filters
+    window.location.href = `{{ url_for('payment.payment_history') }}?${params.toString()}`;
+}
+
+function viewPaymentDetails(paymentId) {
+    // Fetch payment details via AJAX
+    fetch(`/payment/details/${paymentId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('paymentDetailsContent').innerHTML = data.html;
+            new bootstrap.Modal(document.getElementById('paymentDetailsModal')).show();
+        })
+        .catch(error => {
+            console.error('Error fetching payment details:', error);
+            alert('Error loading payment details. Please try again.');
+        });
+}
+
+function downloadReceipt(paymentId) {
+    // Download receipt as PDF
+    window.open(`/payment/receipt/${paymentId}`, '_blank');
+}
+
+// Auto-refresh pending payments every 30 seconds
+setInterval(function() {
+    const pendingBadges = document.querySelectorAll('.badge.bg-warning');
+    if (pendingBadges.length > 0) {
+        // Only refresh if there are pending payments
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

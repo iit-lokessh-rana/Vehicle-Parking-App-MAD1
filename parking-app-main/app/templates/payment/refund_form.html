@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Process Refund - Parking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-6 fw-bold mb-3">Process Refund</h1>
+                <p class="lead text-muted">Process a refund for this payment transaction</p>
+            </div>
+
+            <div class="row">
+                <!-- Payment Details -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-receipt me-2"></i>Payment Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="payment-details">
+                                <div class="detail-item mb-3">
+                                    <div class="row">
+                                        <div class="col-5 text-muted">Reference:</div>
+                                        <div class="col-7 fw-bold">{{ payment.reference_number }}</div>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="row">
+                                        <div class="col-5 text-muted">Booking ID:</div>
+                                        <div class="col-7">#{{ payment.booking.id }}</div>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="row">
+                                        <div class="col-5 text-muted">Customer:</div>
+                                        <div class="col-7">{{ payment.user.first_name }} {{ payment.user.last_name }}</div>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="row">
+                                        <div class="col-5 text-muted">Payment Method:</div>
+                                        <div class="col-7">{{ payment.payment_method.replace('_', ' ').title() }}</div>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="row">
+                                        <div class="col-5 text-muted">Original Amount:</div>
+                                        <div class="col-7 fw-semibold">${{ "%.2f"|format(payment.amount) }}</div>
+                                    </div>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <div class="row">
+                                        <div class="col-5 text-muted">Already Refunded:</div>
+                                        <div class="col-7 text-danger">
+                                            ${{ "%.2f"|format(payment.refunded_amount or 0) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="detail-item">
+                                    <div class="row">
+                                        <div class="col-5 text-muted fw-bold">Available for Refund:</div>
+                                        <div class="col-7 fw-bold text-success">
+                                            ${{ "%.2f"|format(payment.amount - (payment.refunded_amount or 0)) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-calendar-event me-2"></i>Booking Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="booking-details">
+                                <div class="detail-item mb-2">
+                                    <strong>Parking Lot:</strong> {{ payment.booking.spot.parking_lot.name }}
+                                </div>
+                                <div class="detail-item mb-2">
+                                    <strong>Spot:</strong> #{{ payment.booking.spot.spot_number }}
+                                </div>
+                                <div class="detail-item mb-2">
+                                    <strong>Vehicle:</strong> {{ payment.booking.vehicle_plate }}
+                                </div>
+                                <div class="detail-item mb-2">
+                                    <strong>Start Time:</strong> {{ payment.booking.start_time.strftime('%m/%d/%Y %I:%M %p') }}
+                                </div>
+                                <div class="detail-item mb-2">
+                                    <strong>Duration:</strong> {{ payment.booking.duration_hours }} hours
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Status:</strong> 
+                                    <span class="badge bg-{{ 'success' if payment.booking.status == 'confirmed' else 'warning' }}">
+                                        {{ payment.booking.status.title() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Refund Form -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="bi bi-arrow-return-left me-2"></i>Refund Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" id="refund-form">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Refund Amount -->
+                                <div class="mb-4">
+                                    <div class="form-floating">
+                                        {{ form.refund_amount(class="form-control", placeholder="0.00", step="0.01", max=payment.amount - (payment.refunded_amount or 0)) }}
+                                        {{ form.refund_amount.label(class="form-label") }}
+                                    </div>
+                                    {% if form.refund_amount.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.refund_amount.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Maximum refundable amount: ${{ "%.2f"|format(payment.amount - (payment.refunded_amount or 0)) }}
+                                    </div>
+                                </div>
+
+                                <!-- Refund Reason -->
+                                <div class="mb-4">
+                                    <div class="form-floating">
+                                        {{ form.refund_reason(class="form-control") }}
+                                        {{ form.refund_reason.label(class="form-label") }}
+                                    </div>
+                                    {% if form.refund_reason.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.refund_reason.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Additional Notes -->
+                                <div class="mb-4">
+                                    <div class="form-floating">
+                                        {{ form.notes(class="form-control", style="height: 100px", placeholder="Optional notes about this refund...") }}
+                                        {{ form.notes.label(class="form-label") }}
+                                    </div>
+                                </div>
+
+                                <!-- Notification Options -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        {{ form.notify_user(class="form-check-input") }}
+                                        <label class="form-check-label" for="{{ form.notify_user.id }}">
+                                            Send email notification to customer
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Refund Policy Notice -->
+                                <div class="alert alert-info border-0 mb-4">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-info-circle-fill text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-2">
+                                            <h6 class="alert-heading">Refund Policy</h6>
+                                            <ul class="mb-0 small">
+                                                <li>Refunds are processed back to the original payment method</li>
+                                                <li>Processing time: 3-5 business days for cards, 1-2 days for digital wallets</li>
+                                                <li>Partial refunds are allowed for unused portions of bookings</li>
+                                                <li>Full refunds cancel the entire booking</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Buttons -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{{ url_for('user.bookings') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                        <i class="bi bi-arrow-left me-2"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-warning btn-lg px-4" id="submit-refund">
+                                        <i class="bi bi-arrow-return-left me-2"></i>
+                                        <span class="button-text">Process Refund</span>
+                                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="bi bi-lightning me-2"></i>Quick Actions
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <button type="button" class="btn btn-outline-warning w-100" id="full-refund-btn">
+                                        <i class="bi bi-arrow-return-left me-2"></i>Full Refund
+                                    </button>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <button type="button" class="btn btn-outline-info w-100" id="half-refund-btn">
+                                        <i class="bi bi-percent me-2"></i>50% Refund
+                                    </button>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="quarter-refund-btn">
+                                        <i class="bi bi-percent me-2"></i>25% Refund
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Detail Items */
+.detail-item {
+    padding: 4px 0;
+}
+
+.detail-item:not(:last-child) {
+    border-bottom: 1px solid #f8f9fa;
+}
+
+/* Form Enhancements */
+.form-floating > .form-control:focus ~ label {
+    color: #ffc107;
+}
+
+.form-floating > .form-control:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+/* Loading State */
+.btn:disabled {
+    opacity: 0.7;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Quick Action Buttons */
+.btn-outline-warning:hover,
+.btn-outline-info:hover,
+.btn-outline-secondary:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('refund-form');
+    const submitButton = document.getElementById('submit-refund');
+    const refundAmountInput = document.querySelector('input[name="refund_amount"]');
+    
+    // Define refund amounts
+    const maxRefundAmount = parseFloat('{{ "%.2f"|format(payment.amount - (payment.refunded_amount or 0)) }}');
+    const halfRefundAmount = (maxRefundAmount * 0.5).toFixed(2);
+    const quarterRefundAmount = (maxRefundAmount * 0.25).toFixed(2);
+    
+    // Add event listeners for quick refund buttons
+    document.getElementById('full-refund-btn').addEventListener('click', function() {
+        setRefundAmount(maxRefundAmount);
+    });
+    
+    document.getElementById('half-refund-btn').addEventListener('click', function() {
+        setRefundAmount(halfRefundAmount);
+    });
+    
+    document.getElementById('quarter-refund-btn').addEventListener('click', function() {
+        setRefundAmount(quarterRefundAmount);
+    });
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        if (!confirm('Are you sure you want to process this refund? This action cannot be undone.')) {
+            e.preventDefault();
+            return;
+        }
+        
+        submitButton.disabled = true;
+        submitButton.querySelector('.button-text').textContent = 'Processing...';
+        submitButton.querySelector('.spinner-border').classList.remove('d-none');
+    });
+    
+    // Format refund amount input
+    refundAmountInput.addEventListener('input', function(e) {
+        let value = parseFloat(e.target.value);
+        if (isNaN(value) || value < 0) {
+            e.target.value = '';
+        } else {
+            if (value > maxRefundAmount) {
+                e.target.value = maxRefundAmount.toFixed(2);
+            }
+        }
+    });
+});
+
+function setRefundAmount(amount) {
+    const refundAmountInput = document.querySelector('input[name="refund_amount"]');
+    refundAmountInput.value = parseFloat(amount).toFixed(2);
+    refundAmountInput.focus();
+}
+</script>
+{% endblock %}

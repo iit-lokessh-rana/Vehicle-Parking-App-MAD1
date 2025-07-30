@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Edit {{ lot.name }} - Manager{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <a href="{{ url_for('manager.lot_detail', lot_id=lot.id) }}" class="btn btn-link text-decoration-none mb-3 px-0">
+        <i class="bi bi-arrow-left me-2"></i>Back to {{ lot.name }}
+      </a>
+      <h1 class="page-title mb-2">Edit Parking Lot</h1>
+      <p class="lead text-muted">Update basic information and settings for {{ lot.name }}</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Lot Settings</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            <!-- Basic Information -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h6 class="text-muted mb-3">Basic Information</h6>
+              </div>
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="description" class="form-label">Description</label>
+                  <textarea class="form-control" id="description" name="description" rows="3" 
+                            placeholder="Enter a description for this parking lot...">{{ lot.description or '' }}</textarea>
+                  <div class="form-text">Provide a brief description of the parking lot for customers.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h6 class="text-muted mb-3">Pricing</h6>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="hourly_rate" class="form-label">Hourly Rate ($) <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="hourly_rate" name="hourly_rate" 
+                           value="{{ lot.hourly_rate }}" step="0.01" min="0" required>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="daily_rate" class="form-label">Daily Rate ($)</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="daily_rate" name="daily_rate" 
+                           value="{{ lot.daily_rate or '' }}" step="0.01" min="0" placeholder="Optional">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="monthly_rate" class="form-label">Monthly Rate ($)</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="monthly_rate" name="monthly_rate" 
+                           value="{{ lot.monthly_rate or '' }}" step="0.01" min="0" placeholder="Optional">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Operating Hours -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h6 class="text-muted mb-3">Operating Hours</h6>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="opening_time" class="form-label">Opening Time <span class="text-danger">*</span></label>
+                  <input type="time" class="form-control" id="opening_time" name="opening_time" 
+                         value="{{ lot.opening_time.strftime('%H:%M') }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="closing_time" class="form-label">Closing Time <span class="text-danger">*</span></label>
+                  <input type="time" class="form-control" id="closing_time" name="closing_time" 
+                         value="{{ lot.closing_time.strftime('%H:%M') }}" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="d-flex justify-content-between">
+              <a href="{{ url_for('manager.lot_detail', lot_id=lot.id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-2"></i>Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar with Current Info -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Current Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="text-muted">Lot Name</h6>
+            <p class="mb-0">{{ lot.name }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Address</h6>
+            <p class="mb-0">
+              {{ lot.address.street }}<br>
+              {{ lot.address.city }}, {{ lot.address.state }} {{ lot.address.postal_code }}
+            </p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Capacity</h6>
+            <p class="mb-0">{{ lot.total_spots }} total spots</p>
+            <p class="mb-0 text-muted small">{{ lot.available_spots }} currently available</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-muted">Status</h6>
+            <span class="badge bg-{{ 'success' if lot.is_active else 'danger' }}">
+              {{ 'Active' if lot.is_active else 'Inactive' }}
+            </span>
+          </div>
+          
+          <hr>
+          
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Note:</strong> As a manager, you can only edit basic lot information. 
+            Contact an administrator to change the lot name, address, or capacity.
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h5 class="section-title mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('manager.lot_spots', lot_id=lot.id) }}" class="btn btn-outline-primary">
+              <i class="bi bi-grid-3x3 me-2"></i>Manage Spots
+            </a>
+            <a href="{{ url_for('manager.dashboard') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-list-check me-2"></i>View Bookings
+            </a>
+            <form method="POST" action="{{ url_for('manager.toggle_lot_status', lot_id=lot.id) }}" class="d-inline">
+              <button type="submit" class="btn btn-outline-{{ 'danger' if lot.is_active else 'success' }} w-100"
+                      onclick="return confirm('Are you sure you want to {% if lot.is_active %}deactivate{% else %}activate{% endif %} this lot?')">
+                <i class="bi bi-{{ 'pause' if lot.is_active else 'play' }} me-2"></i>{{ 'Deactivate Lot' if lot.is_active else 'Activate Lot' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

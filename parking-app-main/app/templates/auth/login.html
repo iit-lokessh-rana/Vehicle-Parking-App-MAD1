@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Parking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="text-center mb-5">
+                <h1 class="page-title">Welcome Back</h1>
+                <p class="lead">Sign in to access your parking dashboard</p>
+            </div>
+            
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
+                            <i class="bi bi-person-circle" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h3 class="mt-3">Login to Account</h3>
+                        <p class="text-muted">Enter your credentials to continue</p>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('auth.login') }}" class="mt-4">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.email(class="form-control form-control-lg", placeholder="Enter your email", autofocus=true) }}
+                                {{ form.email.label(class="form-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                {{ form.password(class="form-control form-control-lg", placeholder="Enter your password") }}
+                                {{ form.password.label(class="form-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                {{ form.remember(class="form-check-input") }}
+                                {{ form.remember.label(class="form-check-label") }}
+                            </div>
+                            <a href="#" class="text-decoration-none">Forgot password?</a>
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary btn-lg py-3") }}
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Sign up here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

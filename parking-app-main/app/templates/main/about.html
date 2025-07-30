@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}About - Parking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="page-title mb-3">About Our Parking System</h1>
+                <p class="lead text-muted mb-4">Simplifying parking management for operators and users alike</p>
+            </div>
+            
+            <div class="card border-0 shadow-sm mb-5">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 mb-4 mb-lg-0">
+                            <h2 class="section-title mb-4">Our Mission</h2>
+                            <p class="lead mb-4">
+                                We aim to simplify parking management and make it more efficient for both parking lot operators and users.
+                            </p>
+                            <p>
+                                Our system provides a seamless experience for finding, booking, and managing parking spaces, 
+                                reducing the time and effort spent searching for parking spots.
+                            </p>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="bg-primary bg-opacity-10 rounded-4 p-4 text-center">
+                                <i class="bi bi-p-square-fill text-primary" style="font-size: 4rem;"></i>
+                                <h3 class="mt-3 mb-2">Smart Parking Solutions</h3>
+                                <p class="mb-0 text-muted">Efficient, reliable, and user-friendly</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="text-primary mb-3">
+                                <i class="bi bi-stars" style="font-size: 2rem;"></i>
+                            </div>
+                            <h3 class="section-title mb-3">Features</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Real-time parking availability
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Online booking and payment
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    User-friendly interface
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Secure payment processing
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    24/7 customer support
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="text-primary mb-3">
+                                <i class="bi bi-award" style="font-size: 2rem;"></i>
+                            </div>
+                            <h3 class="section-title mb-3">Benefits</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Save time and reduce stress
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Transparent pricing
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Flexible booking options
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Instant confirmation
+                                </li>
+                                <li class="list-group-item px-0 py-2 border-0">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Easy cancellation
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm bg-gradient-primary text-white rounded-4 overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <h3 class="mb-3">Get Started Today</h3>
+                    <p class="lead mb-4">
+                        Ready to experience hassle-free parking? Create an account and start booking your parking spots today.
+                    </p>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-light btn-lg px-4 py-2">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Login Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
